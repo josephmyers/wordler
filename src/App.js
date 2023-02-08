@@ -12,8 +12,8 @@ export default function App() {
   const onKeyPress = button => {
     if (isLetter(button))
     {
-      const firstEmptySpace = word.findIndex(letter => letter == "");
-      if (firstEmptySpace != -1)
+      const firstEmptySpace = word.findIndex(letter => letter === "");
+      if (firstEmptySpace !== -1)
       {
         setWord(oldValue => {
           const newValue = [...oldValue];
@@ -24,10 +24,10 @@ export default function App() {
     }
     else if (button === "{bksp}")
     {
-      const firstEmptySpace = word.findIndex(letter => letter == "");
-      const lastFilledSpace = firstEmptySpace == -1 ? word.length-1 : firstEmptySpace-1;
+      const firstEmptySpace = word.findIndex(letter => letter === "");
+      const lastFilledSpace = firstEmptySpace === -1 ? word.length-1 : firstEmptySpace-1;
       
-      if (lastFilledSpace != -1)
+      if (lastFilledSpace !== -1)
       {
         setWord(oldValue => {
           const newValue = [...oldValue];
