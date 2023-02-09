@@ -9,6 +9,14 @@ export default function App() {
 
   const row = word.map(c => <div className='App-letter'>{c.toUpperCase()}</div>)
 
+  const layout = {
+    default: [
+      "q w e r t y u i o p",
+      "a s d f g h j k l",
+      "z x c v b n m Backspace",
+    ]
+  }
+
   const onKeyPress = button => {
     if (isLetter(button))
     {
@@ -51,6 +59,7 @@ export default function App() {
       <div className="App-main">{row}</div>
       <div className='Keyboard'>
         <Keyboard
+            layout={layout}
             theme={"hg-theme-default darkTheme"}
             onKeyPress={b => onKeyPress(b)}
           />
