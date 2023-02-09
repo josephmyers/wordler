@@ -30,7 +30,7 @@ export default function App() {
         })
       }
     }
-    else if (button === "{bksp}")
+    else if (button === "Backspace")
     {
       const firstEmptySpace = word.findIndex(letter => letter === "");
       const lastFilledSpace = firstEmptySpace === -1 ? word.length-1 : firstEmptySpace-1;
