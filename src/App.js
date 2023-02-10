@@ -1,13 +1,31 @@
 import React from 'react';
 import logo from './logo.svg';
-import Keyboard from 'react-simple-keyboard'
+import Keyboard from 'react-simple-keyboard';
+import Row from './Row.js';
 import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
 
 export default function App() {
-  const [word, setWord] = React.useState([ "", "", "", "", "" ])
+  class Word {
+    constructor(word) {
+      this.letters = ["", "", "", "", ""];
+      for (let i = 0; i < 5 && i < word.length; i++)
+      {
+        this.letters[i] = word[i];
+      }
+    }
 
-  const row = word.map(c => <div className='App-letter'>{c.toUpperCase()}</div>)
+    firstEmptySpace() {
+      return this.letters.findIndex(letter => letter === "");
+    }
+
+    firstFilledSpace() {
+      return this.letters.findIndex(letter => letter !== "");
+    }
+  }
+
+  const [words, setWords] = React.useState([new Word("")])
+  const rows = words.map(w => <Row value={w} />)
 
   const layout = {
     default: [
@@ -17,34 +35,83 @@ export default function App() {
     ]
   }
 
-  const onKeyPress = button => {
+  function onKeyPress(button) {
     if (isLetter(button))
     {
-      const firstEmptySpace = word.findIndex(letter => letter === "");
-      if (firstEmptySpace !== -1)
-      {
-        setWord(oldValue => {
-          const newValue = [...oldValue];
-          newValue[firstEmptySpace] = button;
-          return newValue;
-        })
-      }
+      addLetter(button);
     }
     else if (button === "Backspace")
     {
-      const firstEmptySpace = word.findIndex(letter => letter === "");
-      const lastFilledSpace = firstEmptySpace === -1 ? word.length-1 : firstEmptySpace-1;
-      
-      if (lastFilledSpace !== -1)
-      {
-        setWord(oldValue => {
-          const newValue = [...oldValue];
-          newValue[lastFilledSpace] = "";
-          return newValue;
-        })
-      }
+      removeLastLetter();
     }
   };
+
+  function addLetter(button) {
+    const wordToEdit = firstIncompleteWord(words);
+    if (wordToEdit !== -1) {
+      const firstEmptySpace = words[wordToEdit].firstEmptySpace();
+      setWords(oldWords => {
+        const newWord = new Word(oldWords[wordToEdit].letters);
+        newWord.letters[firstEmptySpace] = button;
+
+        const newWords = [...oldWords];
+        newWords[wordToEdit] = newWord;
+
+        if (firstIncompleteWord(newWords) === -1) {
+          newWords.push(new Word(""));
+        }
+
+        return newWords;
+      });
+    }
+  }
+
+  function removeLastLetter() {
+    const indexOfLastWord = lastWord(words);
+    if (indexOfLastWord !== -1) {
+      const firstEmptySpace = words[indexOfLastWord].firstEmptySpace();
+      const lastFilledSpace = firstEmptySpace === -1 ? words[indexOfLastWord].letters.length - 1 : firstEmptySpace - 1;
+
+      setWords(oldWords => {
+        const newWord = new Word(oldWords[indexOfLastWord].letters);
+        newWord.letters[lastFilledSpace] = "";
+
+        const newWords = [...oldWords];
+        newWords[indexOfLastWord] = newWord;
+
+        if (lastWord(newWords) >= 0)
+        {
+          const incompleteWordExists = newWords[lastWord(newWords)].firstEmptySpace() > -1;
+          const emptyRowExists = newWords[newWords.length - 1].firstFilledSpace() < 0;
+          if (incompleteWordExists && emptyRowExists) {
+            newWords.pop();
+          }
+        }
+
+        return newWords;
+      });
+    }
+  }
+
+  function firstIncompleteWord(words) {
+    for (let i = 0; i < words.length; i++)
+    {
+      const hasEmptySpace = words[i].firstEmptySpace() > -1;
+      if (hasEmptySpace) return i;
+    }
+
+    return -1;
+  }
+
+  function lastWord(words) {
+    for (let i = words.length-1; i >= 0; i--)
+    {
+      const hasLetter = words[i].firstFilledSpace() > -1;
+      if (hasLetter) return i;
+    }
+
+    return -1;
+  }
 
   function isLetter(str) {
     return str.length === 1 && str.match(/[a-z]/i);
@@ -56,7 +123,7 @@ export default function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
       </header>
-      <div className="App-main">{row}</div>
+      <div className="App-main">{rows}</div>
       <div className='Keyboard'>
         <Keyboard
             layout={layout}
