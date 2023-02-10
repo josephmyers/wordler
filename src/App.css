@@ -29,12 +29,14 @@ header {
 }
 
 main {
-  margin-top: 5px;
-  margin-bottom: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   display: flex;
   flex-direction: column;
   justify-content: top;
   flex-grow: 1;
+  overflow-y: auto;
+  height: 0px;
 }
 
 footer {
