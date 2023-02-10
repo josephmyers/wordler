@@ -119,18 +119,18 @@ export default function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header>
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
       </header>
-      <div className="App-main">{rows}</div>
-      <div className='Keyboard'>
+      <main>{rows}</main>
+      <footer>
         <Keyboard
             layout={layout}
             theme={"hg-theme-default darkTheme"}
             onKeyPress={b => onKeyPress(b)}
           />
-      </div>
+      </footer>
     </div>
   );
 }

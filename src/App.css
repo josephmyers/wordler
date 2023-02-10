@@ -14,7 +14,7 @@
   pointer-events: none;
 }
 
-.App-header {
+header {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -22,21 +22,31 @@
   border-bottom-color: #424956;
   border-bottom-width: 1px;
   border-bottom-style: solid;
+  background-color: #282c34;
+
+  position: sticky;
+  top: 0;
 }
 
-.App-main {
+main {
   margin-top: 5px;
+  margin-bottom: 5px;
   display: flex;
   flex-direction: column;
   justify-content: top;
   flex-grow: 1;
 }
 
+footer {
+  position: sticky;
+  bottom: 0;
+}
+
 /*
   Theme: darkTheme
 */
 .simple-keyboard.darkTheme {
-  background-color: rgba(30, 30, 30, 0.8);
+  background-color: rgba(30, 30, 30);
   border-radius: 0;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
