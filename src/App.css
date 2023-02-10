@@ -61,6 +61,10 @@ footer {
   color: white;
 }
 
+.simple-keyboard.darkTheme .special-button {
+  background: rgb(62, 62, 62);
+}
+
 .simple-keyboard.darkTheme .hg-button:active {
   background: #1c4995;
   color: white;

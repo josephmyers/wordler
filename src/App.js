@@ -35,6 +35,15 @@ export default function App() {
     ]
   }
 
+  const display = {
+    "Backspace": "⌫",
+  }
+
+  const buttonTheme = [{
+    class: "special-button",
+    buttons: "Backspace"
+  }]
+
   function onKeyPress(button) {
     if (isLetter(button))
     {
@@ -126,8 +135,9 @@ export default function App() {
       <main>{rows}</main>
       <footer>
         <Keyboard
-            layout={layout}
+            layout={layout} display={display}
             theme={"hg-theme-default darkTheme"}
+            buttonTheme={buttonTheme}
             onKeyPress={b => onKeyPress(b)}
           />
       </footer>
