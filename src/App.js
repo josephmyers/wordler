@@ -43,7 +43,7 @@ export default function App() {
     {
       setPossibilities(dictionary);
     }
-  }, [words])
+  }, [words, dictionary]);
 
   const layout = {
     default: [
@@ -71,7 +71,7 @@ export default function App() {
     {
       removeLastLetter();
     }
-  };
+  }
 
   function addLetter(button) {
     const wordToEdit = firstIncompleteWord(words);
