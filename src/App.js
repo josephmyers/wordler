@@ -4,6 +4,7 @@ import Keyboard from 'react-simple-keyboard';
 import Row from './Row.js';
 import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
+import dictionaryRaw from './dictionary.txt'
 
 export default function App() {
   class Word {
@@ -24,8 +25,25 @@ export default function App() {
     }
   }
 
-  const [words, setWords] = React.useState([new Word("")])
-  const rows = words.map(w => <Row value={w} />)
+  const [words, setWords] = React.useState([new Word("")]);
+  const rows = words.map(w => <Row value={w} />);
+  const [dictionary, setDictionary] = React.useState();
+  const [possibilities, setPossibilities] = React.useState();
+
+  React.useEffect(() => {
+    (async () => {
+        const response = await fetch(dictionaryRaw);
+        setDictionary(await response.text());
+      }
+    )()
+  }, []);
+
+  React.useEffect(() => {
+    if (lastWord(words) >= 0)
+    {
+      setPossibilities(dictionary);
+    }
+  }, [words])
 
   const layout = {
     default: [
@@ -132,7 +150,15 @@ export default function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
       </header>
-      <main>{rows}</main>
+      <main>
+        <div className='App-rows'>{rows}</div>
+        {possibilities !== undefined &&
+          <div className='App-results-container'>
+            <div><h3>Possibilities</h3></div>
+            <div>{possibilities}</div>
+          </div>
+        }
+      </main>
       <footer>
         <Keyboard
             layout={layout} display={display}

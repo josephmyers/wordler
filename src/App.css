@@ -29,14 +29,28 @@ header {
 }
 
 main {
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow-y: auto;
+  height: 0px;
+  column-gap: 10px;
+}
+
+.App-rows {
   display: flex;
   flex-direction: column;
   justify-content: top;
   flex-grow: 1;
-  overflow-y: auto;
-  height: 0px;
+}
+
+.App-results-container {
+  max-width: 60vw;
+}
+
+h3 {
+  margin: 5px;
 }
 
 footer {
