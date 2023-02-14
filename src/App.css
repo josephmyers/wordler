@@ -9,8 +9,9 @@
   /* font-size: calc(10px + 2vmin); */
 }
 
-.App-logo {
-  height: 40px;
+.App-logo, .App-results-icon {
+  height: 30px;
+  padding: 8px;
   pointer-events: none;
 }
 
@@ -28,25 +29,52 @@ header {
   top: 0;
 }
 
-main {
-  padding: 5px;
+.App-middle {
   display: flex;
-  flex-direction: row;
   flex-grow: 1;
-  overflow-y: auto;
+  flex-direction: row;
   height: 0px;
+}
+
+main {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
   column-gap: 10px;
+  overflow-y: auto;
 }
 
 .App-rows {
+  padding: 5px;
   display: flex;
   flex-direction: column;
   justify-content: top;
   flex-grow: 1;
 }
 
-.App-results-container {
+.App-results-container-full {
   max-width: 60vw;
+}
+
+.App-results-container-small {
+  max-width: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  flex-grow: 1;
+  background-color: #32363f;
+}
+
+@media (max-width: 640px) {
+  .App-results-container-full {
+    display: none;
+  }
+}
+
+@media (min-width: 641px) {
+  .App-results-container-small {
+    display: none;
+  }  
 }
 
 h3 {

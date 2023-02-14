@@ -1,5 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
+import logo from './brain.svg';
+import lightbulb from './lightbulb.svg';
 import Keyboard from 'react-simple-keyboard';
 import Row from './Row.js';
 import './App.css';
@@ -150,15 +151,22 @@ export default function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
       </header>
-      <main>
-        <div className='App-rows'>{rows}</div>
+      <div className='App-middle'>
+        <main>
+          <div className='App-rows'>{rows}</div>
+          {possibilities !== undefined &&
+            <div className='App-results-container-full'>
+              <div><h3>Possibilities</h3></div>
+              <div>{possibilities}</div>
+            </div>
+          }
+        </main>
         {possibilities !== undefined &&
-          <div className='App-results-container'>
-            <div><h3>Possibilities</h3></div>
-            <div>{possibilities}</div>
+          <div className='App-results-container-small'>
+            <img src={lightbulb} className='App-results-icon' />
           </div>
         }
-      </main>
+      </div>
       <footer>
         <Keyboard
             layout={layout} display={display}
