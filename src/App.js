@@ -163,7 +163,7 @@ export default function App() {
         </main>
         {possibilities !== undefined &&
           <div className='App-results-container-small'>
-            <img src={lightbulb} className='App-results-icon' />
+            <img src={lightbulb} className='App-results-icon' alt='Results' />
           </div>
         }
       </div>
