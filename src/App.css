@@ -7,14 +7,21 @@
   flex-direction: column;
 }
 
-.App-logo, .App-results-icon {
+.App-logo, .App-results-icon, .App-results-icon-active {
   height: 30px;
   width: 30px;
   padding: 8px;
 }
 
-.App-results-icon:hover {
+.App-results-icon:hover, .App-results-icon-active:hover {
   background-color: #49505b;
+  border-radius: 8px;
+}
+
+.App-results-icon-active {
+  border-radius: 12px;
+  /* box-shadow prevents shifting */
+  box-shadow: inset 0 0 0 1px #00BFFF;
 }
 
 header {
@@ -104,10 +111,10 @@ footer {
 }
 
 .simple-keyboard.darkTheme .hg-button:active {
-  background: #1c4995;
+  background: #00BFFF;
   color: white;
 }
 
 #root .simple-keyboard.darkTheme + .simple-keyboard-preview {
-  background: #1c4995;
+  background: #00BFFF;
 }

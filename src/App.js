@@ -186,8 +186,10 @@ export default function App() {
         }
         {(isSmallScreen && possibilities !== undefined) &&
           <div className='App-sidebar'>
-            <img src={lightbulb} className='App-results-icon' alt='Results'
-              onClick={toggleFlyout} />
+            <img src={lightbulb}
+                 className={showFlyout ? 'App-results-icon-active' : 'App-results-icon'}
+                 alt='Results'
+                 onClick={toggleFlyout} />
           </div>
         }
       </div>
