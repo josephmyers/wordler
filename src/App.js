@@ -31,6 +31,7 @@ export default function App() {
   const [dictionary, setDictionary] = React.useState();
   const [possibilities, setPossibilities] = React.useState();
   const [showFlyout, setShowFlyout] = React.useState(false);
+  const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
 
   React.useEffect(() => {
     (async () => {
@@ -46,6 +47,15 @@ export default function App() {
       setPossibilities(dictionary);
     }
   }, [words, dictionary]);
+  
+  React.useEffect(() => {
+    function checkForSmallScreen() {
+      setIsSmallScreen(window.innerWidth <= 640);
+    }
+
+    window.addEventListener('resize', checkForSmallScreen);
+    return () => window.removeEventListener('resize', checkForSmallScreen);
+  }, []);
 
   const layout = {
     default: [
@@ -150,18 +160,6 @@ export default function App() {
     setShowFlyout(oldValue => !oldValue);
   }
 
-  React.useEffect(() => {
-    function resetFlyoutAsWindowChanges() {
-      if (window.innerWidth > 640)
-      {
-        setShowFlyout(false);
-      }
-    }
-
-    window.addEventListener('resize', resetFlyoutAsWindowChanges);
-    return () => window.removeEventListener('resize', resetFlyoutAsWindowChanges);
-  }, []);
-
   return (
     <div className="App">
       <header>
@@ -169,10 +167,10 @@ export default function App() {
         <p>Wordler</p>
       </header>
       <div className='App-middle'>
-        {!showFlyout &&
+        {(!isSmallScreen || !showFlyout) &&
           <main>
             <div className='App-rows'>{rows}</div>
-            {possibilities !== undefined &&
+            {(!isSmallScreen && possibilities !== undefined) &&
               <div className='App-results-container-full'>
                 <div><h3>Possibilities</h3></div>
                 <div>{possibilities}</div>
@@ -180,13 +178,13 @@ export default function App() {
             }
           </main>
         }
-        {showFlyout &&
+        {(isSmallScreen && showFlyout) &&
           <div className='App-flyout'>
             <div><h3>Possibilities</h3></div>
             <div>{possibilities}</div>
           </div>
         }
-        {possibilities !== undefined &&
+        {(isSmallScreen && possibilities !== undefined) &&
           <div className='App-sidebar'>
             <img src={lightbulb} className='App-results-icon' alt='Results'
               onClick={toggleFlyout} />
@@ -194,7 +192,7 @@ export default function App() {
         }
       </div>
       <footer>
-        {!showFlyout && 
+        {(!isSmallScreen || !showFlyout) && 
           <Keyboard
             layout={layout} display={display}
             theme={"hg-theme-default darkTheme"}

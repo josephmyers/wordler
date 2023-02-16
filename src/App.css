@@ -71,18 +71,6 @@ main {
   overflow-y: auto;
 }
 
-@media (max-width: 640px) {
-  .App-results-container-full {
-    display: none;
-  }
-}
-
-@media (min-width: 641px) {
-  .App-sidebar, .App-flyout {
-    display: none;
-  }  
-}
-
 h3 {
   margin: 5px;
 }
