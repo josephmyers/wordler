@@ -5,14 +5,16 @@
   color: white;
   display: flex;
   flex-direction: column;
-
-  /* font-size: calc(10px + 2vmin); */
 }
 
 .App-logo, .App-results-icon {
   height: 30px;
+  width: 30px;
   padding: 8px;
-  pointer-events: none;
+}
+
+.App-results-icon:hover {
+  background-color: #49505b;
 }
 
 header {
@@ -56,13 +58,17 @@ main {
   max-width: 60vw;
 }
 
-.App-results-container-small {
-  max-width: 50px;
+.App-sidebar {
   display: flex;
   flex-direction: column;
   justify-content: top;
-  flex-grow: 1;
-  background-color: #32363f;
+  background-color: #424956;
+}
+
+.App-flyout {
+  background-color: #282c34;
+  border: 1px solid #424956;
+  overflow-y: auto;
 }
 
 @media (max-width: 640px) {
@@ -72,7 +78,7 @@ main {
 }
 
 @media (min-width: 641px) {
-  .App-results-container-small {
+  .App-sidebar, .App-flyout {
     display: none;
   }  
 }

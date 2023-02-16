@@ -30,6 +30,7 @@ export default function App() {
   const rows = words.map(w => <Row value={w} />);
   const [dictionary, setDictionary] = React.useState();
   const [possibilities, setPossibilities] = React.useState();
+  const [showFlyout, setShowFlyout] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -145,6 +146,22 @@ export default function App() {
     return str.length === 1 && str.match(/[a-z]/i);
   }
 
+  function toggleFlyout() {
+    setShowFlyout(oldValue => !oldValue);
+  }
+
+  React.useEffect(() => {
+    function resetFlyoutAsWindowChanges() {
+      if (window.innerWidth > 640)
+      {
+        setShowFlyout(false);
+      }
+    }
+
+    window.addEventListener('resize', resetFlyoutAsWindowChanges);
+    return () => window.removeEventListener('resize', resetFlyoutAsWindowChanges);
+  }, []);
+
   return (
     <div className="App">
       <header>
@@ -152,28 +169,39 @@ export default function App() {
         <p>Wordler</p>
       </header>
       <div className='App-middle'>
-        <main>
-          <div className='App-rows'>{rows}</div>
-          {possibilities !== undefined &&
-            <div className='App-results-container-full'>
-              <div><h3>Possibilities</h3></div>
-              <div>{possibilities}</div>
-            </div>
-          }
-        </main>
+        {!showFlyout &&
+          <main>
+            <div className='App-rows'>{rows}</div>
+            {possibilities !== undefined &&
+              <div className='App-results-container-full'>
+                <div><h3>Possibilities</h3></div>
+                <div>{possibilities}</div>
+              </div>
+            }
+          </main>
+        }
+        {showFlyout &&
+          <div className='App-flyout'>
+            <div><h3>Possibilities</h3></div>
+            <div>{possibilities}</div>
+          </div>
+        }
         {possibilities !== undefined &&
-          <div className='App-results-container-small'>
-            <img src={lightbulb} className='App-results-icon' alt='Results' />
+          <div className='App-sidebar'>
+            <img src={lightbulb} className='App-results-icon' alt='Results'
+              onClick={toggleFlyout} />
           </div>
         }
       </div>
       <footer>
-        <Keyboard
+        {!showFlyout && 
+          <Keyboard
             layout={layout} display={display}
             theme={"hg-theme-default darkTheme"}
             buttonTheme={buttonTheme}
             onKeyPress={b => onKeyPress(b)}
           />
+        }
       </footer>
     </div>
   );
