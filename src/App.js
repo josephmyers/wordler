@@ -44,7 +44,8 @@ export default function App() {
   React.useEffect(() => {
     if (lastWord(words) >= 0)
     {
-      setPossibilities(dictionary);
+      const elements = dictionary.split("\r\n").map(w => <div className='App-result'>{w}</div>);
+      setPossibilities(elements);
     }
   }, [words, dictionary]);
   
@@ -173,7 +174,7 @@ export default function App() {
             {(!isSmallScreen && possibilities !== undefined) &&
               <div className='App-results-container-full'>
                 <div><h3>Possibilities</h3></div>
-                <div>{possibilities}</div>
+                <div className='App-results'>{possibilities}</div>
               </div>
             }
           </main>
@@ -181,7 +182,7 @@ export default function App() {
         {(isSmallScreen && showFlyout) &&
           <div className='App-flyout'>
             <div><h3>Possibilities</h3></div>
-            <div>{possibilities}</div>
+            <div className='App-results'>{possibilities}</div>
           </div>
         }
         {(isSmallScreen && possibilities !== undefined) &&
