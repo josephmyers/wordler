@@ -1,0 +1,23 @@
+.Sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  background-color: #424956;
+}
+
+.Results-icon, .Results-icon-active {
+  height: 30px;
+  width: 30px;
+  padding: 8px;
+}
+
+.Results-icon:hover, .Results-icon-active:hover {
+  background-color: #49505b;
+  border-radius: 8px;
+}
+
+.Results-icon-active {
+  border-radius: 12px;
+  /* box-shadow prevents shifting */
+  box-shadow: inset 0 0 0 1px #00BFFF;
+}

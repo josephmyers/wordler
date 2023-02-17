@@ -1,10 +1,10 @@
 import React from 'react';
 import logo from './brain.svg';
-import lightbulb from './lightbulb.svg';
-import Keyboard from 'react-simple-keyboard';
 import Row from './Row.js';
+import Keyboard from './Keyboard.js';
+import Results from './Results.js';
+import Sidebar from './Sidebar.js';
 import './App.css';
-import 'react-simple-keyboard/build/css/index.css';
 import dictionaryRaw from './dictionary.txt'
 
 export default function App() {
@@ -44,8 +44,7 @@ export default function App() {
   React.useEffect(() => {
     if (lastWord(words) >= 0)
     {
-      const elements = dictionary.split("\r\n").map(w => <div className='App-result'>{w}</div>);
-      setPossibilities(elements);
+      setPossibilities(dictionary.split("\r\n"));
     }
   }, [words, dictionary]);
   
@@ -57,23 +56,6 @@ export default function App() {
     window.addEventListener('resize', checkForSmallScreen);
     return () => window.removeEventListener('resize', checkForSmallScreen);
   }, []);
-
-  const layout = {
-    default: [
-      "q w e r t y u i o p",
-      "a s d f g h j k l",
-      "z x c v b n m Backspace",
-    ]
-  }
-
-  const display = {
-    "Backspace": "⌫",
-  }
-
-  const buttonTheme = [{
-    class: "special-button",
-    buttons: "Backspace"
-  }]
 
   function onKeyPress(button) {
     if (isLetter(button))
@@ -172,36 +154,20 @@ export default function App() {
           <main>
             <div className='App-rows'>{rows}</div>
             {(!isSmallScreen && possibilities !== undefined) &&
-              <div className='App-results-container-full'>
-                <div><h3>Possibilities</h3></div>
-                <div className='App-results'>{possibilities}</div>
-              </div>
+              <Results styleClass='Results-container-full' possibilities={possibilities} />
             }
           </main>
         }
         {(isSmallScreen && showFlyout) &&
-          <div className='App-flyout'>
-            <div><h3>Possibilities</h3></div>
-            <div className='App-results'>{possibilities}</div>
-          </div>
+          <Results styleClass='Results-flyout' possibilities={possibilities} />
         }
         {(isSmallScreen && possibilities !== undefined) &&
-          <div className='App-sidebar'>
-            <img src={lightbulb}
-                 className={showFlyout ? 'App-results-icon-active' : 'App-results-icon'}
-                 alt='Results'
-                 onClick={toggleFlyout} />
-          </div>
+          <Sidebar toggleFlyout={toggleFlyout} showFlyout={showFlyout} />
         }
       </div>
       <footer>
         {(!isSmallScreen || !showFlyout) && 
-          <Keyboard
-            layout={layout} display={display}
-            theme={"hg-theme-default darkTheme"}
-            buttonTheme={buttonTheme}
-            onKeyPress={b => onKeyPress(b)}
-          />
+          <Keyboard onKeyPress={onKeyPress} />
         }
       </footer>
     </div>
