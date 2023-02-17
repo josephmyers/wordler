@@ -8,30 +8,65 @@ import './App.css';
 import dictionaryRaw from './dictionary.txt'
 
 export default function App() {
-  class Word {
-    constructor(word) {
-      this.letters = ["", "", "", "", ""];
-      for (let i = 0; i < 5 && i < word.length; i++)
-      {
-        this.letters[i] = word[i];
-      }
-    }
+  const LetterStatus = {
+    NotPresent: 0,
+    WrongSpot: 1,
+    RightSpot: 2
+  }
 
-    firstEmptySpace() {
-      return this.letters.findIndex(letter => letter === "");
-    }
-
-    firstFilledSpace() {
-      return this.letters.findIndex(letter => letter !== "");
+  class Letter {
+    constructor() {
+      this.letter = "";
+      this.status = LetterStatus.NotPresent;
     }
   }
 
-  const [words, setWords] = React.useState([new Word("")]);
-  const rows = words.map(w => <Row value={w} />);
+  class Word {
+    constructor(letters) {
+      this.letters = [new Letter(), new Letter(), new Letter(), new Letter(), new Letter()];
+      for (let i = 0; i < 5 && i < letters.length; i++)
+      {
+        this.letters[i] = letters[i];
+      }
+    }
+
+    static createEmpty() {
+      return [new Letter(), new Letter(), new Letter(), new Letter(), new Letter()];
+    }
+
+    firstEmptySpace() {
+      return this.letters.findIndex(letter => letter.letter === "");
+    }
+
+    firstFilledSpace() {
+      return this.letters.findIndex(letter => letter.letter !== "");
+    }
+  }
+
+  const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
+  const rows = words.map(w => <Row word={w} onClick={incrementLetterStatus} />);
   const [dictionary, setDictionary] = React.useState();
   const [possibilities, setPossibilities] = React.useState();
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
+
+  function incrementLetterStatus(word, letter) {
+    if (letter.letter !== "")
+    {
+      const indexOfChangedWord = words.indexOf(word);
+      const indexOfChangedLetter = word.letters.indexOf(letter);
+      const newWord = new Word(word.letters);
+      let status = newWord.letters[indexOfChangedLetter].status;
+      status = (status + 1) % Object.keys(LetterStatus).length;
+      newWord.letters[indexOfChangedLetter].status = status;
+
+      setWords(oldWords => {
+        const newWords = [...oldWords];
+        newWords[indexOfChangedWord] = newWord;
+        return newWords;
+      });
+    }
+  }
 
   React.useEffect(() => {
     (async () => {
@@ -74,13 +109,13 @@ export default function App() {
       const firstEmptySpace = words[wordToEdit].firstEmptySpace();
       setWords(oldWords => {
         const newWord = new Word(oldWords[wordToEdit].letters);
-        newWord.letters[firstEmptySpace] = button;
+        newWord.letters[firstEmptySpace].letter = button;
 
         const newWords = [...oldWords];
         newWords[wordToEdit] = newWord;
 
         if (firstIncompleteWord(newWords) === -1) {
-          newWords.push(new Word(""));
+          newWords.push(new Word(Word.createEmpty()));
         }
 
         return newWords;
@@ -96,7 +131,8 @@ export default function App() {
 
       setWords(oldWords => {
         const newWord = new Word(oldWords[indexOfLastWord].letters);
-        newWord.letters[lastFilledSpace] = "";
+        newWord.letters[lastFilledSpace].letter = "";
+        newWord.letters[lastFilledSpace].status = LetterStatus.NotPresent;
 
         const newWords = [...oldWords];
         newWords[indexOfLastWord] = newWord;
