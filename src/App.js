@@ -33,6 +33,9 @@ export default function App() {
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
 
+  window.addEventListener("load", function() { window.scrollTo(0, 0); });
+  document.addEventListener("touchmove", function(e) { e.preventDefault() });
+
   React.useEffect(() => {
     (async () => {
         const response = await fetch(dictionaryRaw);
