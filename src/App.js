@@ -44,7 +44,7 @@ export default function App() {
   React.useEffect(() => {
     if (lastWord(words) >= 0)
     {
-      setPossibilities(dictionary.split("\r\n"));
+      setPossibilities(dictionary.split(/\r\n|\r|\n/));
     }
   }, [words, dictionary]);
   
