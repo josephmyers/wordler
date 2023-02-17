@@ -50,24 +50,6 @@ export default function App() {
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
 
-  function incrementLetterStatus(word, letter) {
-    if (letter.letter !== "")
-    {
-      const indexOfChangedWord = words.indexOf(word);
-      const indexOfChangedLetter = word.letters.indexOf(letter);
-      const newWord = new Word(word.letters);
-      let status = newWord.letters[indexOfChangedLetter].status;
-      status = (status + 1) % Object.keys(LetterStatus).length;
-      newWord.letters[indexOfChangedLetter].status = status;
-
-      setWords(oldWords => {
-        const newWords = [...oldWords];
-        newWords[indexOfChangedWord] = newWord;
-        return newWords;
-      });
-    }
-  }
-
   React.useEffect(() => {
     (async () => {
         const response = await fetch(dictionaryRaw);
@@ -169,6 +151,24 @@ export default function App() {
     }
 
     return -1;
+  }
+
+  function incrementLetterStatus(word, letter) {
+    if (letter.letter !== "")
+    {
+      const indexOfChangedWord = words.indexOf(word);
+      const indexOfChangedLetter = word.letters.indexOf(letter);
+      const newWord = new Word(word.letters);
+      let status = newWord.letters[indexOfChangedLetter].status;
+      status = (status + 1) % Object.keys(LetterStatus).length;
+      newWord.letters[indexOfChangedLetter].status = status;
+
+      setWords(oldWords => {
+        const newWords = [...oldWords];
+        newWords[indexOfChangedWord] = newWord;
+        return newWords;
+      });
+    }
   }
 
   function isLetter(str) {
