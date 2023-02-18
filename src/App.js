@@ -46,7 +46,6 @@ export default function App() {
   const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
   const rows = words.map(w => <Row word={w} onClick={incrementLetterStatus} />);
   const [dictionary, setDictionary] = React.useState();
-  const [possibilities, setPossibilities] = React.useState();
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
 
@@ -58,12 +57,11 @@ export default function App() {
     )()
   }, []);
 
-  React.useEffect(() => {
-    if (lastWord(words) >= 0)
-    {
-      setPossibilities(dictionary.split(/\r\n|\r|\n/));
-    }
-  }, [words, dictionary]);
+  let possibilities;
+  if (lastWord(words) >= 0)
+  {
+    possibilities = dictionary.split(/\r\n|\r|\n/);
+  }
   
   React.useEffect(() => {
     function checkForSmallScreen() {
