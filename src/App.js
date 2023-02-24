@@ -33,14 +33,14 @@ export default function App() {
     static createEmpty() {
       return [new Letter(), new Letter(), new Letter(), new Letter(), new Letter()];
     }
+  }
 
-    firstEmptySpace() {
-      return this.letters.findIndex(letter => letter.letter === "");
-    }
+  function firstEmptySpace(word) {
+    return word.letters.findIndex(letter => letter.letter === "");
+  }
 
-    firstFilledSpace() {
-      return this.letters.findIndex(letter => letter.letter !== "");
-    }
+  function firstFilledSpace(word) {
+    return word.letters.findIndex(letter => letter.letter !== "");
   }
 
   const [dictionary, setDictionary] = React.useState();
@@ -49,8 +49,6 @@ export default function App() {
   const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
   const rows = words.map(w => <Row word={w} onClick={incrementLetterStatus} />);
   const rowLimit = 6;
-  const knownLetters = getKnownLetters();
-  const mysteryLetters = getMysteryLetters()[0];
 
   React.useEffect(() => {
     (async () => {
@@ -86,15 +84,16 @@ export default function App() {
     }
   }
 
+  //todo recheck on add
   function addLetter(button) {
     const wordToEdit = firstIncompleteWord(words);
     if (wordToEdit !== -1) {
-      const firstEmptySpace = words[wordToEdit].firstEmptySpace();
+      const firstEmptySpaceIndex = firstEmptySpace(words[wordToEdit]);
       setWords(oldWords => {
         const newWord = new Word(oldWords[wordToEdit].letters);
-        newWord.letters[firstEmptySpace].letter = button;
+        newWord.letters[firstEmptySpaceIndex].letter = button;
 
-        const newWords = [...oldWords];
+        const newWords = structuredClone(oldWords);
         newWords[wordToEdit] = newWord;
 
         if (firstIncompleteWord(newWords) === -1 && newWords.length < rowLimit) {
@@ -109,21 +108,21 @@ export default function App() {
   function removeLastLetter() {
     const indexOfLastWord = lastWord(words);
     if (indexOfLastWord !== -1) {
-      const firstEmptySpace = words[indexOfLastWord].firstEmptySpace();
-      const lastFilledSpace = firstEmptySpace === -1 ? words[indexOfLastWord].letters.length - 1 : firstEmptySpace - 1;
+      const firstEmptySpaceIndex = firstEmptySpace(words[indexOfLastWord]);
+      const lastFilledSpace = firstEmptySpaceIndex === -1 ? words[indexOfLastWord].letters.length - 1 : firstEmptySpaceIndex - 1;
 
       setWords(oldWords => {
         const newWord = new Word(oldWords[indexOfLastWord].letters);
         newWord.letters[lastFilledSpace].letter = "";
         newWord.letters[lastFilledSpace].status = LetterStatus.NotPresent;
 
-        const newWords = [...oldWords];
+        const newWords = structuredClone(oldWords);
         newWords[indexOfLastWord] = newWord;
 
         if (lastWord(newWords) >= 0)
         {
-          const incompleteWordExists = newWords[lastWord(newWords)].firstEmptySpace() > -1;
-          const emptyRowExists = newWords[newWords.length - 1].firstFilledSpace() < 0;
+          const incompleteWordExists = firstEmptySpace(newWords[lastWord(newWords)]) > -1;
+          const emptyRowExists = firstFilledSpace(newWords[newWords.length - 1]) < 0;
           if (incompleteWordExists && emptyRowExists) {
             newWords.pop();
           }
@@ -137,7 +136,7 @@ export default function App() {
   function firstIncompleteWord(words) {
     for (let i = 0; i < words.length; i++)
     {
-      const hasEmptySpace = words[i].firstEmptySpace() > -1;
+      const hasEmptySpace = firstEmptySpace(words[i]) > -1;
       if (hasEmptySpace) return i;
     }
 
@@ -147,7 +146,7 @@ export default function App() {
   function lastWord(words) {
     for (let i = words.length-1; i >= 0; i--)
     {
-      const hasLetter = words[i].firstFilledSpace() > -1;
+      const hasLetter = firstFilledSpace(words[i]) > -1;
       if (hasLetter) return i;
     }
 
@@ -164,31 +163,150 @@ export default function App() {
       let newStatus = newWord.letters[indexOfChangedLetter].status;
       newStatus = (newStatus + 1) % Object.keys(LetterStatus).length;
 
-      const numKnownLetters = knownLetters.filter(l => l.letter !== "").length;
-      const numMysteryLetters = mysteryLetters.length;
-      if (numKnownLetters + numMysteryLetters === 5 && oldStatus === LetterStatus.NotPresent)
-      {
-        return; //don't add any more letters
-      }
-
-      const greenExistsInThisSpot = knownLetters[indexOfChangedLetter].status === LetterStatus.RightSpot;
-      if (newStatus === LetterStatus.RightSpot && greenExistsInThisSpot)
-      {
-        newStatus = (newStatus + 1) % Object.keys(LetterStatus).length; //skip green
-      }
-
-      newWord.letters[indexOfChangedLetter].status = newStatus;
-
-      //todo highlight occurrences in other letters
       setWords(oldWords => {
-        const newWords = [...oldWords];
+        const newWords = structuredClone(oldWords);
+        
+        newWord.letters[indexOfChangedLetter].status = newStatus;
         newWords[indexOfChangedWord] = newWord;
+
+        const previousWords = newWords.slice(0, indexOfChangedWord);
+        if (!isChangeAllowed(letter, previousWords, newWord, newStatus))
+        {
+          newStatus = (newStatus + 1) % Object.keys(LetterStatus).length;
+          newWord.letters[indexOfChangedLetter].status = newStatus;
+          if (!isChangeAllowed(letter, previousWords, newWord, newStatus)) //try the remaining status
+          {
+            newWord.letters[indexOfChangedLetter].status = oldStatus; //undo
+            return newWords;
+          }
+        }
+
+        const wordsUpToThisPoint = newWords.slice(0, indexOfChangedWord+1);
+        const [knownLetters, mysteryLetters] = getLettersInAnswer(wordsUpToThisPoint);
+        const knownAndMysteryLetters = knownLetters.concat(mysteryLetters).filter(l => l.letter !== "");
+
+        if (knownAndMysteryLetters.length > 5)
+        {
+          newWord.letters[indexOfChangedLetter].status = oldStatus; //undo
+          return newWords;
+        }
+
+        clearAndInitialize(newWords, knownLetters, knownAndMysteryLetters, indexOfChangedWord);
+
         return newWords;
       });
     }
   }
 
-  function getKnownLetters() {
+  function isChangeAllowed(letter, previousWords, word, newStatus) {
+    const [knownLetters, mysteryLetters] = getLettersInAnswer(previousWords);
+    const knownAndMysteryLetters = knownLetters.concat(mysteryLetters).filter(l => l.letter !== "");
+    const indexOfChangedLetter = word.letters.indexOf(letter);
+
+    const matchesInPreviousWords = knownAndMysteryLetters.filter(l => l.letter === letter.letter).length;
+    const matchesInNewWord = word.letters.filter(
+      l => l.letter === letter.letter && l.status !== LetterStatus.NotPresent).length;
+    
+    //disallow change if previous column is same letter and green
+    if (newStatus === LetterStatus.NotPresent || newStatus === LetterStatus.WrongSpot)
+    {
+      for (let row = 0; row < previousWords.length; row++)
+      {
+        if (previousWords[row].letters[indexOfChangedLetter].letter === letter.letter &&
+            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus.RightSpot)
+        {
+          return false;
+        }
+      }
+    }
+    //disallow yellow -> green when column is already yellow
+    if (newStatus === LetterStatus.RightSpot)
+    {
+      for (let row = 0; row < previousWords.length; row++)
+      {
+        if (previousWords[row].letters[indexOfChangedLetter].letter === letter.letter &&
+            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus.WrongSpot)
+        {
+          return false;
+        }
+      }
+    }
+    //disallow deletions based on previous rows
+    if (newStatus === LetterStatus.NotPresent && matchesInPreviousWords > matchesInNewWord)
+    {
+      return false;
+    }
+    //disallow additions based on previous rows
+    if (newStatus === LetterStatus.WrongSpot || newStatus === LetterStatus.RightSpot)
+    {
+      const mostOccurrencesOfLetter = getMostOccurrencesOfLetter(letter, previousWords);
+      if (mostOccurrencesOfLetter > 0 && mostOccurrencesOfLetter > matchesInPreviousWords)
+      {
+        const exactOccurrencesInAnswer = matchesInPreviousWords;
+        if (matchesInNewWord > exactOccurrencesInAnswer)
+        {
+          return false;
+        }
+      }
+    }
+    //disallow green if column already has one
+    if (newStatus === LetterStatus.RightSpot)
+    {
+      if (knownLetters[indexOfChangedLetter].letter != '')
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function getMostOccurrencesOfLetter(letter, words) {
+    let mostOccurrences = 0;
+    for (let row = 0; row < words.length; row++)
+    {
+      const count = words[row].letters.filter(l => l.letter === letter.letter).length;
+      if (count > mostOccurrences)
+      {
+        mostOccurrences = count;
+      }
+    }
+
+    return mostOccurrences;
+  }
+
+  function clearAndInitialize(newWords, knownLetters, knownAndMysteryLetters, indexOfChangedWord) {
+    for (let row = indexOfChangedWord+1; row < newWords.length; row++) {
+      for (let i = 0; i < 5; i++) {
+        const currentLetter = newWords[row].letters[i];
+        currentLetter.status = LetterStatus.NotPresent;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const currentLetter = newWords[row].letters[i];
+        if (currentLetter.letter === '')
+          break;
+        if (knownLetters[i].letter === currentLetter.letter) {
+          currentLetter.status = LetterStatus.RightSpot;
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const currentLetter = newWords[row].letters[i];
+        if (currentLetter.letter === '')
+          break;
+        const occurrencesInAnswer = knownAndMysteryLetters.filter(l => l.letter === currentLetter.letter);
+        const matchesInCurrentWord = newWords[row].letters.filter(
+          l => l.letter === currentLetter.letter && l.status !== LetterStatus.NotPresent);
+        const isMysteryLetterNeeded = occurrencesInAnswer.length > matchesInCurrentWord.length;
+        if (isMysteryLetterNeeded && currentLetter.status === LetterStatus.NotPresent) {
+          currentLetter.status = LetterStatus.WrongSpot;
+        }
+      }
+    }
+  }
+
+  function getKnownLetters(words) {
     const word = new Word(Word.createEmpty());
     for (let letter = 0; letter < 5; letter++)
     {
@@ -207,7 +325,8 @@ export default function App() {
     return word.letters;
   }
 
-  function getMysteryLetters() {
+  function getLettersInAnswer(words) {
+    const knownLetters = getKnownLetters(words);
     const allExclusions = {};
     const mysteryLetters = [];
     for (let row = 0; row < words.length; row++)
@@ -216,7 +335,11 @@ export default function App() {
       for (let letterIndex = 0; letterIndex < 5; letterIndex++)
       {
         const currentLetter = words[row].letters[letterIndex];
-        if (currentLetter.status === LetterStatus.WrongSpot)
+        if (currentLetter.status === LetterStatus.RightSpot)
+        {
+          exclusionsInThisWord.push(currentLetter);
+        }
+        else if (currentLetter.status === LetterStatus.WrongSpot)
         {
           exclusionsInThisWord.push(currentLetter);
 
@@ -236,19 +359,23 @@ export default function App() {
           {
             mysteryLetters.push(currentLetter);
           }
+        }
+        else
+        {
+          continue;
+        }
 
-          const numOccurrencesInThisWord = exclusionsInThisWord.filter(l => l.letter === currentLetter.letter).length;
-          const numOccurrencesInMysteryLetters = mysteryLetters.filter(l => l.letter === currentLetter.letter).length;
-          const numOccurrencesInKnownLetters = knownLetters.filter(l => l.letter === currentLetter.letter).length;
-          if (numOccurrencesInThisWord > numOccurrencesInMysteryLetters + numOccurrencesInKnownLetters)
-          {
-            mysteryLetters.push(currentLetter);
-          }
+        const numOccurrencesInThisWord = exclusionsInThisWord.filter(l => l.letter === currentLetter.letter).length;
+        const numOccurrencesInMysteryLetters = mysteryLetters.filter(l => l.letter === currentLetter.letter).length;
+        const numOccurrencesInKnownLetters = knownLetters.filter(l => l.letter === currentLetter.letter).length;
+        if (numOccurrencesInThisWord > numOccurrencesInMysteryLetters + numOccurrencesInKnownLetters)
+        {
+          mysteryLetters.push(currentLetter);
         }
       }
     }
 
-    return [mysteryLetters, allExclusions];
+    return [knownLetters, mysteryLetters];
   }
 
   function isLetter(str) {
