@@ -46,7 +46,7 @@ export default function HelpText(props) {
     const words = props.words;
     for (let w in words)
     {
-      if (words[w].letters.filter(l => l.status != 0).length > 0)
+      if (words[w].letters.filter(l => l.status !== 0).length > 0)
       {
         setHasSetStatus(true);
         return;
