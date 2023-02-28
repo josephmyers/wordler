@@ -47,7 +47,7 @@ export default function App() {
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
   const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
-  const rows = words.map(w => <Row word={w} onClick={incrementLetterStatus} />);
+  const rows = words.map((w, index) => <Row word={w} key={index} onClick={incrementLetterStatus} />);
   const rowLimit = 6;
 
   React.useEffect(() => {
@@ -252,7 +252,7 @@ export default function App() {
     //disallow green if column already has one
     if (newStatus === LetterStatus.RightSpot)
     {
-      if (knownLetters[indexOfChangedLetter].letter != '')
+      if (knownLetters[indexOfChangedLetter].letter !== '')
       {
         return false;
       }

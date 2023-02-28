@@ -15,8 +15,9 @@ export default function Row(props) {
     return 'Letter-NotPresent';
   }
 
-  const letters = props.word.letters.map(l => (
+  const letters = props.word.letters.map((l, index) => (
     <div onClick={() => props.onClick(props.word, l)}
+         key={index} //letters will never move
          className={getLetterStyle(l.status)}>
       {l.letter.toUpperCase()}
     </div>
