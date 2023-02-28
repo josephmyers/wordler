@@ -25,21 +25,24 @@ body {
 .App-logo {
   height: 30px;
   width: 30px;
-  padding: 8px;
+  padding: 8px 8px 8px 0px;
 }
 
 header {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: left;
   border-bottom-color: #424956;
   border-bottom-width: 1px;
   border-bottom-style: solid;
   background-color: #282c34;
+  padding: 0px 10px;
 
   position: sticky;
   top: 0;
+}
+
+.App-help-text {
+  margin-left: auto;
 }
 
 .App-middle {
