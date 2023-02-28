@@ -84,7 +84,6 @@ export default function App() {
     }
   }
 
-  //todo recheck on add
   function addLetter(button) {
     const wordToEdit = firstIncompleteWord(words);
     if (wordToEdit !== -1) {
@@ -96,12 +95,33 @@ export default function App() {
         const newWords = structuredClone(oldWords);
         newWords[wordToEdit] = newWord;
 
+        const indexOfWord = oldWords.indexOf(wordToEdit);
+        const precedingWords = oldWords.slice(0, indexOfWord);
+        const [knownLetters, mysteryLetters] = getLettersInAnswer(precedingWords);
+
+        updateNewLetterStatus(firstEmptySpaceIndex, button, newWord, knownLetters, mysteryLetters);
+
         if (firstIncompleteWord(newWords) === -1 && newWords.length < rowLimit) {
           newWords.push(new Word(Word.createEmpty()));
         }
 
         return newWords;
       });
+    }
+  }
+
+  function updateNewLetterStatus(letterIndex, newValue, newWord, knownLetters, mysteryLetters) {
+    if (knownLetters[letterIndex].letter === newValue) {
+      newWord.letters[letterIndex].status = LetterStatus.RightSpot;
+    }
+    else {
+      const knownAndMysteryLetters = knownLetters.concat(mysteryLetters).filter(l => l.letter !== "");
+      const matchesInPreviousWords = knownAndMysteryLetters.filter(l => l.letter === newValue);
+      const matchesInChangedWord = newWord.letters.filter(
+        l => l.letter === newValue && l.status !== LetterStatus.NotPresent);
+      if (matchesInChangedWord.length < matchesInPreviousWords.length) {
+        newWord.letters[letterIndex].status = LetterStatus.WrongSpot;
+      }
     }
   }
 
