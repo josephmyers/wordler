@@ -1,5 +1,5 @@
 import React from 'react';
-import './HelpText.css';
+import './Help.css';
 import question from './question.svg';
 
 export default function HelpText(props) {

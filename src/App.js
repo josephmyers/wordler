@@ -4,7 +4,7 @@ import Row from './Row.js';
 import Keyboard from './Keyboard.js';
 import Results from './Results.js';
 import Sidebar from './Sidebar.js';
-import HelpText from './HelpText.js';
+import Help from './Help.js';
 import './App.css';
 import dictionaryRaw from './dictionary.txt'
 
@@ -412,7 +412,7 @@ export default function App() {
       <header>
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
-        <div className="App-help-text"><HelpText words={words} /></div>
+        <div className="App-help-text"><Help words={words} /></div>
       </header>
       <div className='App-middle'>
         {(!isSmallScreen || !showFlyout) &&
