@@ -1,16 +1,17 @@
 import React from 'react';
 import './HelpText.css';
+import question from './question.svg';
 
 export default function HelpText(props) {
-  let text;
-  const [shouldDisplay, setShouldDisplay] = React.useState(false);
   const [hasSetStatus, setHasSetStatus] = React.useState(false);
   const [secondsLeft, setSecondsLeft] =  React.useState(2);
-  const [fade, setFade] = React.useState('fade-out');
+  const [fade, setFade] = React.useState('fade-in');
+  const [flashHelp, setFlashHelp] = React.useState(false);
+  const [helpOpened, setHelpOpened] = React.useState(false);
 
   React.useEffect(() => {
     const timeout = setInterval(() => {
-      if (shouldDisplay)
+      if (!hasSetStatus && secondsLeft === 0 && flashHelp)
       {
         if (fade === 'fade-in') {
           setFade('fade-out');
@@ -18,23 +19,23 @@ export default function HelpText(props) {
           setFade('fade-in');
         }
       }
-    }, 2000);
+      else if (hasSetStatus || !flashHelp)
+      {
+        setFade('fade-in');
+      }
+    }, 1000);
     return () => clearInterval(timeout);
-  }, [fade, shouldDisplay]);
+  }, [fade, secondsLeft, hasSetStatus, flashHelp]);
 
   React.useEffect(()=> {
     let myInterval = setInterval(() =>
       {
         if (secondsLeft > 0 && props.words.length > 2) {
           setSecondsLeft(secondsLeft - 1);
-        }
-        if (secondsLeft === 0 && !hasSetStatus)
-        {
-          setShouldDisplay(true);
-        }
-        else
-        {
-          setShouldDisplay(false);
+          if (!helpOpened)
+          {
+            setFlashHelp(true);
+          }
         }
       }, 1000);
     return () => clearInterval(myInterval);
@@ -42,19 +43,25 @@ export default function HelpText(props) {
 
   if (!hasSetStatus)
   {
-    text = "Touch letter to filter";
     const words = props.words;
     for (let w in words)
     {
       if (words[w].letters.filter(l => l.status !== 0).length > 0)
       {
         setHasSetStatus(true);
-        return;
+        break;
       }
     }
-  
-    return (shouldDisplay && <div className={fade}>{text}</div>);
   }
 
-  return;
+  function showHelp() {
+    setFlashHelp(false);
+    setHelpOpened(true);
+  }
+
+  return (
+    <div className={fade} onClick={showHelp}>
+      <img src={question} className="icon" alt="help" />
+    </div>
+  );
 }

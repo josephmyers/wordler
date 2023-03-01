@@ -1,8 +1,19 @@
+.icon {
+  width: 20px;
+  padding: 2px;
+  margin-top: 4px;
+}
+
+.icon:hover {
+  background-color: #373a3f;
+  border-radius: 6px;
+}
+
 .fade-in {
   transition: opacity 1s ease;
 }
 
 .fade-out {
-  opacity: 0;
+  opacity: 0.4;
   transition: opacity 1s ease;
 }
