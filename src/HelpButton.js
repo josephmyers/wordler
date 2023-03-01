@@ -1,5 +1,5 @@
 import React from 'react';
-import './Help.css';
+import './HelpButton.css';
 import question from './question.svg';
 
 export default function HelpText(props) {
@@ -57,6 +57,7 @@ export default function HelpText(props) {
   function showHelp() {
     setFlashHelp(false);
     setHelpOpened(true);
+    props.click();
   }
 
   return (

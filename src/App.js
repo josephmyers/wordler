@@ -4,7 +4,7 @@ import Row from './Row.js';
 import Keyboard from './Keyboard.js';
 import Results from './Results.js';
 import Sidebar from './Sidebar.js';
-import Help from './Help.js';
+import Help from './HelpButton.js';
 import './App.css';
 import dictionaryRaw from './dictionary.txt'
 
@@ -48,6 +48,7 @@ export default function App() {
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
   const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
+  const [isHelpOpen, setIsHelpOpen] = React.useState(false);
   const rows = words.map((w, index) => <Row word={w} key={index} onClick={incrementLetterStatus} />);
   const rowLimit = 6;
 
@@ -407,12 +408,19 @@ export default function App() {
     setShowFlyout(oldValue => !oldValue);
   }
 
+  function openHelp()
+  {
+    setIsHelpOpen(true);
+  }
+
   return (
     <div className="App">
       <header>
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
-        <div className="App-help-text"><Help words={words} /></div>
+        <div className="App-help-text">
+          <Help words={words} click={openHelp} isHelpOpen={isHelpOpen} />
+        </div>
       </header>
       <div className='App-middle'>
         {(!isSmallScreen || !showFlyout) &&
