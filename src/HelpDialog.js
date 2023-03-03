@@ -1,16 +1,13 @@
 import React from 'react';
 import './HelpDialog.css';
-import brain from './brain.svg';
+import logo from './logo.png';
 
 export default function HelpDialog(props) {
   return (
   <div className={props.isShown ? 'dialog' : 'hidden'}>
     <div className='content'>
       <button className='close-button' onClick={props.close}>X</button>
-      <div className='title'>
-        <img src={brain} alt='logo' className='logo' />
-        <h2>Wordler</h2>
-      </div>
+      <img src={logo} className='title' alt='logo' />
       <h3>Helpful Hints:</h3>
       <ul className='tips'>
         <li>Tap letters to filter</li>

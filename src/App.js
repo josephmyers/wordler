@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './brain.svg';
+import logo from './logo.png';
 import Row from './Row.js';
 import Keyboard from './Keyboard.js';
 import Results from './Results.js';
@@ -422,7 +422,6 @@ export default function App() {
     <div className="App">
       <header>
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Wordler</p>
         <div className="App-help-text">
           <HelpButton words={words} click={openHelp} isHelpOpen={isHelpOpen} />
         </div>
