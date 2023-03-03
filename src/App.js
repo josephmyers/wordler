@@ -4,7 +4,9 @@ import Row from './Row.js';
 import Keyboard from './Keyboard.js';
 import Results from './Results.js';
 import Sidebar from './Sidebar.js';
-import Help from './HelpButton.js';
+import HelpButton from './HelpButton.js';
+import HelpDialog from './HelpDialog.js';
+import Mask from './AppMask.js';
 import './App.css';
 import dictionaryRaw from './dictionary.txt'
 
@@ -408,9 +410,12 @@ export default function App() {
     setShowFlyout(oldValue => !oldValue);
   }
 
-  function openHelp()
-  {
+  function openHelp() {
     setIsHelpOpen(true);
+  }
+
+  function closeHelp() {
+    setIsHelpOpen(false);
   }
 
   return (
@@ -419,7 +424,7 @@ export default function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>Wordler</p>
         <div className="App-help-text">
-          <Help words={words} click={openHelp} isHelpOpen={isHelpOpen} />
+          <HelpButton words={words} click={openHelp} isHelpOpen={isHelpOpen} />
         </div>
       </header>
       <div className='App-middle'>
@@ -443,6 +448,8 @@ export default function App() {
           <Keyboard onKeyPress={onKeyPress} />
         }
       </footer>
+      <Mask isShown={isHelpOpen} click={closeHelp} />
+      <HelpDialog isShown={isHelpOpen} close={closeHelp} />
     </div>
   );
 }

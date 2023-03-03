@@ -1,0 +1,71 @@
+.dialog {
+  background-color: #25272a;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+
+  display: flex;
+  
+  min-height: 400px;
+  max-height: 900px;
+  min-width: 400px;
+  max-width: 600px;
+
+  opacity: 97%;
+  transition: opacity 0.2s;
+}
+
+.hidden {
+  width: 0px;
+  height: 0px;
+  opacity: 0;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.close-button {
+  align-self: flex-end;
+  padding: 15px 15px 0px 0px;
+  background-color: transparent;
+  border-width: 0px;
+  color: white;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 10px 30px;
+  gap: 30px;
+}
+
+.logo {
+  width: 80px;
+}
+
+.tips {
+  text-align: left;
+  padding-right: 30px;
+  padding-left: 40px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  align-items: flex-end;
+  font-size: 9pt;
+}
+
+.link {
+  color: #00BFFF;
+  font-style: italic;
+}

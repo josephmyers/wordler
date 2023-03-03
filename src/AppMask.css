@@ -1,0 +1,17 @@
+.mask {
+  background-color: #131313;
+  opacity: 70%;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+
+  transition: opacity 0.8s;
+}
+
+.hidden {
+  opacity: 0;
+  width: 0px;
+  height: 0px;
+}
