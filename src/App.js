@@ -7,36 +7,12 @@ import Sidebar from './Sidebar.js';
 import HelpButton from './HelpButton.js';
 import HelpDialog from './HelpDialog.js';
 import Mask from './AppMask.js';
+import Word from './Word.js';
+import getLettersInAnswer from './WordsParser.js';
+import LetterStatus from './LetterStatus.js';
 import './App.css';
 
 export default function App() {
-  const LetterStatus = {
-    NotPresent: 0,
-    WrongSpot: 1,
-    RightSpot: 2
-  }
-
-  class Letter {
-    constructor() {
-      this.letter = "";
-      this.status = LetterStatus.NotPresent;
-    }
-  }
-
-  class Word {
-    constructor(letters) {
-      this.letters = [new Letter(), new Letter(), new Letter(), new Letter(), new Letter()];
-      for (let i = 0; i < 5 && i < letters.length; i++)
-      {
-        this.letters[i] = letters[i];
-      }
-    }
-
-    static createEmpty() {
-      return [new Letter(), new Letter(), new Letter(), new Letter(), new Letter()];
-    }
-  }
-
   function firstEmptySpace(word) {
     return word.letters.findIndex(letter => letter.letter === "");
   }
@@ -106,15 +82,15 @@ export default function App() {
 
   function updateNewLetterStatus(letterIndex, newValue, newWord, knownLetters, mysteryLetters) {
     if (knownLetters[letterIndex].letter === newValue) {
-      newWord.letters[letterIndex].status = LetterStatus.RightSpot;
+      newWord.letters[letterIndex].status = LetterStatus().RightSpot;
     }
     else {
       const knownAndMysteryLetters = knownLetters.concat(mysteryLetters).filter(l => l.letter !== "");
       const matchesInPreviousWords = knownAndMysteryLetters.filter(l => l.letter === newValue);
       const matchesInChangedWord = newWord.letters.filter(
-        l => l.letter === newValue && l.status !== LetterStatus.NotPresent);
+        l => l.letter === newValue && l.status !== LetterStatus().NotPresent);
       if (matchesInChangedWord.length < matchesInPreviousWords.length) {
-        newWord.letters[letterIndex].status = LetterStatus.WrongSpot;
+        newWord.letters[letterIndex].status = LetterStatus().WrongSpot;
       }
     }
   }
@@ -128,7 +104,7 @@ export default function App() {
       setWords(oldWords => {
         const newWord = new Word(oldWords[indexOfLastWord].letters);
         newWord.letters[lastFilledSpace].letter = "";
-        newWord.letters[lastFilledSpace].status = LetterStatus.NotPresent;
+        newWord.letters[lastFilledSpace].status = LetterStatus().NotPresent;
 
         const newWords = structuredClone(oldWords);
         newWords[indexOfLastWord] = newWord;
@@ -175,7 +151,7 @@ export default function App() {
       const newWord = new Word(word.letters);
       const oldStatus = newWord.letters[indexOfChangedLetter].status;
       let newStatus = newWord.letters[indexOfChangedLetter].status;
-      newStatus = (newStatus + 1) % Object.keys(LetterStatus).length;
+      newStatus = (newStatus + 1) % Object.keys(LetterStatus()).length;
 
       setWords(oldWords => {
         const newWords = structuredClone(oldWords);
@@ -186,7 +162,7 @@ export default function App() {
         const previousWords = newWords.slice(0, indexOfChangedWord);
         if (!isChangeAllowed(letter, previousWords, newWord, newStatus))
         {
-          newStatus = (newStatus + 1) % Object.keys(LetterStatus).length;
+          newStatus = (newStatus + 1) % Object.keys(LetterStatus()).length;
           newWord.letters[indexOfChangedLetter].status = newStatus;
           if (!isChangeAllowed(letter, previousWords, newWord, newStatus)) //try the remaining status
           {
@@ -219,39 +195,39 @@ export default function App() {
 
     const matchesInPreviousWords = knownAndMysteryLetters.filter(l => l.letter === letter.letter).length;
     const matchesInNewWord = word.letters.filter(
-      l => l.letter === letter.letter && l.status !== LetterStatus.NotPresent).length;
+      l => l.letter === letter.letter && l.status !== LetterStatus().NotPresent).length;
     
     //disallow change if previous column is same letter and green
-    if (newStatus === LetterStatus.NotPresent || newStatus === LetterStatus.WrongSpot)
+    if (newStatus === LetterStatus().NotPresent || newStatus === LetterStatus().WrongSpot)
     {
       for (let row = 0; row < previousWords.length; row++)
       {
         if (previousWords[row].letters[indexOfChangedLetter].letter === letter.letter &&
-            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus.RightSpot)
+            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus().RightSpot)
         {
           return false;
         }
       }
     }
     //disallow yellow -> green when column is already yellow
-    if (newStatus === LetterStatus.RightSpot)
+    if (newStatus === LetterStatus().RightSpot)
     {
       for (let row = 0; row < previousWords.length; row++)
       {
         if (previousWords[row].letters[indexOfChangedLetter].letter === letter.letter &&
-            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus.WrongSpot)
+            previousWords[row].letters[indexOfChangedLetter].status === LetterStatus().WrongSpot)
         {
           return false;
         }
       }
     }
     //disallow deletions based on previous rows
-    if (newStatus === LetterStatus.NotPresent && matchesInPreviousWords > matchesInNewWord)
+    if (newStatus === LetterStatus().NotPresent && matchesInPreviousWords > matchesInNewWord)
     {
       return false;
     }
     //disallow additions based on previous rows
-    if (newStatus === LetterStatus.WrongSpot || newStatus === LetterStatus.RightSpot)
+    if (newStatus === LetterStatus().WrongSpot || newStatus === LetterStatus().RightSpot)
     {
       const mostOccurrencesOfLetter = getMostOccurrencesOfLetter(letter, previousWords);
       if (mostOccurrencesOfLetter > 0 && mostOccurrencesOfLetter > matchesInPreviousWords)
@@ -264,7 +240,7 @@ export default function App() {
       }
     }
     //disallow green if column already has one
-    if (newStatus === LetterStatus.RightSpot)
+    if (newStatus === LetterStatus().RightSpot)
     {
       if (knownLetters[indexOfChangedLetter].letter !== '')
       {
@@ -293,7 +269,7 @@ export default function App() {
     for (let row = indexOfChangedWord+1; row < newWords.length; row++) {
       for (let i = 0; i < 5; i++) {
         const currentLetter = newWords[row].letters[i];
-        currentLetter.status = LetterStatus.NotPresent;
+        currentLetter.status = LetterStatus().NotPresent;
       }
 
       for (let i = 0; i < 5; i++) {
@@ -301,7 +277,7 @@ export default function App() {
         if (currentLetter.letter === '')
           break;
         if (knownLetters[i].letter === currentLetter.letter) {
-          currentLetter.status = LetterStatus.RightSpot;
+          currentLetter.status = LetterStatus().RightSpot;
         }
       }
 
@@ -311,85 +287,13 @@ export default function App() {
           break;
         const occurrencesInAnswer = knownAndMysteryLetters.filter(l => l.letter === currentLetter.letter);
         const matchesInCurrentWord = newWords[row].letters.filter(
-          l => l.letter === currentLetter.letter && l.status !== LetterStatus.NotPresent);
+          l => l.letter === currentLetter.letter && l.status !== LetterStatus().NotPresent);
         const isMysteryLetterNeeded = occurrencesInAnswer.length > matchesInCurrentWord.length;
-        if (isMysteryLetterNeeded && currentLetter.status === LetterStatus.NotPresent) {
-          currentLetter.status = LetterStatus.WrongSpot;
+        if (isMysteryLetterNeeded && currentLetter.status === LetterStatus().NotPresent) {
+          currentLetter.status = LetterStatus().WrongSpot;
         }
       }
     }
-  }
-
-  function getKnownLetters(words) {
-    const word = new Word(Word.createEmpty());
-    for (let letter = 0; letter < 5; letter++)
-    {
-      if (word.letters[letter].letter !== "") continue;
-
-      for (let i = 0; i < words.length; i++)
-      {
-        if (words[i].letters[letter].status === LetterStatus.RightSpot)
-        {
-          word.letters[letter] = words[i].letters[letter];
-          continue;
-        }
-      }
-    }
-
-    return word.letters;
-  }
-
-  function getLettersInAnswer(words) {
-    const knownLetters = getKnownLetters(words);
-    const allExclusions = {};
-    const mysteryLetters = [];
-    for (let row = 0; row < words.length; row++)
-    {
-      const exclusionsInThisWord = [];
-      for (let letterIndex = 0; letterIndex < 5; letterIndex++)
-      {
-        const currentLetter = words[row].letters[letterIndex];
-        if (currentLetter.status === LetterStatus.RightSpot)
-        {
-          exclusionsInThisWord.push(currentLetter);
-        }
-        else if (currentLetter.status === LetterStatus.WrongSpot)
-        {
-          exclusionsInThisWord.push(currentLetter);
-
-          if (!allExclusions[letterIndex])
-          {
-            allExclusions[letterIndex] = [];
-          }
-
-          const hasLetterOccurredBefore = allExclusions[letterIndex].findIndex(l => l.letter === currentLetter.letter) >= 0;
-          if (!hasLetterOccurredBefore)
-          {
-            allExclusions[letterIndex].push(currentLetter);
-          }
-
-          if (mysteryLetters.findIndex(l => l.letter === currentLetter.letter) === -1 &&
-              knownLetters.findIndex(l => l.letter === currentLetter.letter) === -1)
-          {
-            mysteryLetters.push(currentLetter);
-          }
-        }
-        else
-        {
-          continue;
-        }
-
-        const numOccurrencesInThisWord = exclusionsInThisWord.filter(l => l.letter === currentLetter.letter).length;
-        const numOccurrencesInMysteryLetters = mysteryLetters.filter(l => l.letter === currentLetter.letter).length;
-        const numOccurrencesInKnownLetters = knownLetters.filter(l => l.letter === currentLetter.letter).length;
-        if (numOccurrencesInThisWord > numOccurrencesInMysteryLetters + numOccurrencesInKnownLetters)
-        {
-          mysteryLetters.push(currentLetter);
-        }
-      }
-    }
-
-    return [knownLetters, mysteryLetters];
   }
 
   function isLetter(str) {

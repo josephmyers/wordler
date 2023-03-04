@@ -1,13 +1,14 @@
 import React from 'react';
+import LetterStatus from './LetterStatus';
 import './Row.css'
 
 export default function Row(props) {
   function getLetterStyle(letterStatus) {
-    if (letterStatus === 1)
+    if (letterStatus === LetterStatus().WrongSpot)
     {
       return 'Letter-WrongSpot';
     }
-    if (letterStatus === 2)
+    if (letterStatus === LetterStatus().RightSpot)
     {
       return 'Letter-RightSpot';
     }

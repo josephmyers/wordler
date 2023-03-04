@@ -1,4 +1,5 @@
 import React from 'react';
+import LetterStatus from './LetterStatus';
 import './HelpButton.css';
 import question from './question.svg';
 
@@ -46,7 +47,7 @@ export default function HelpText(props) {
     const words = props.words;
     for (let w in words)
     {
-      if (words[w].letters.filter(l => l.status !== 0).length > 0)
+      if (words[w].letters.filter(l => l.status !== LetterStatus().NotPresent).length > 0)
       {
         setHasSetStatus(true);
         break;
