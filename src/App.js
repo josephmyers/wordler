@@ -8,7 +8,6 @@ import HelpButton from './HelpButton.js';
 import HelpDialog from './HelpDialog.js';
 import Mask from './AppMask.js';
 import './App.css';
-import dictionaryRaw from './dictionary.txt'
 
 export default function App() {
   const LetterStatus = {
@@ -46,7 +45,6 @@ export default function App() {
     return word.letters.findIndex(letter => letter.letter !== "");
   }
 
-  const [dictionary, setDictionary] = React.useState();
   const [showFlyout, setShowFlyout] = React.useState(false);
   const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 640);
   const [words, setWords] = React.useState([new Word(Word.createEmpty())]);
@@ -54,18 +52,10 @@ export default function App() {
   const rows = words.map((w, index) => <Row word={w} key={index} onClick={incrementLetterStatus} />);
   const rowLimit = 6;
 
-  React.useEffect(() => {
-    (async () => {
-        const response = await fetch(dictionaryRaw);
-        setDictionary(await response.text());
-      }
-    )()
-  }, []);
-
-  let possibilities;
+  let showResults = false;
   if (lastWord(words) >= 0)
   {
-    possibilities = dictionary.split(/\r\n|\r|\n/);
+    showResults = true;
   }
   
   React.useEffect(() => {
@@ -430,15 +420,15 @@ export default function App() {
         {(!isSmallScreen || !showFlyout) &&
           <main>
             <div className='App-rows'>{rows}</div>
-            {(!isSmallScreen && possibilities !== undefined) &&
-              <Results styleClass='Results-container-full' possibilities={possibilities} />
+            {(!isSmallScreen && showResults) &&
+              <Results styleClass='Results-container-full' words={words} />
             }
           </main>
         }
         {(isSmallScreen && showFlyout) &&
-          <Results styleClass='Results-flyout' possibilities={possibilities} />
+          <Results styleClass='Results-flyout' words={words} />
         }
-        {(isSmallScreen && possibilities !== undefined) &&
+        {(isSmallScreen && showResults) &&
           <Sidebar toggleFlyout={toggleFlyout} showFlyout={showFlyout} />
         }
       </div>
