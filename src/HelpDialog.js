@@ -12,6 +12,8 @@ export default function HelpDialog(props) {
       <ul className='tips'>
         <li>Tap letters to filter</li>
         <li>Changing previous filters may overwrite later ones</li>
+        <li>Changing later filters won't overwrite prevous ones</li>
+        <li>Careful! This can make the game boring...</li>
       </ul>
       <div className='footer'>
         <p>
